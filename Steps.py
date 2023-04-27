@@ -40,36 +40,63 @@ data = [(20262, 17083, 3179),
     (14780, 12255, 2525),
 ]
 #find the average of the first column of data and print out the result
-def average_iwatch_steps(data):
-    total = 0
-    num_days = len(data)
-    for iwatch, iphone, diff in data:
-        total += iwatch
-    return total / num_days
+# def average_iwatch_steps(data):
+#     total = 0
+#     num_days = len(data)
+#     for iwatch, iphone, diff in data:
+#         total += iwatch
+#     return total / num_days
 
-print("Average iWatch steps per day:", average_iwatch_steps(data))
-
-
+# print("Average iWatch steps per day:", average_iwatch_steps(data))
 
 
-def analyze_steps(data):
-    total_iwatch_steps = 0
-    total_iphone_steps = 0
-    total_difference = 0
-    num_days = len(data)
+
+
+# def analyze_steps(data):
+#     total_iwatch_steps = 0
+#     total_iphone_steps = 0
+#     total_difference = 0
+#     num_days = len(data)
  
-    for iwatch, iphone, diff in data:
-        total_iwatch_steps += iwatch
-        total_iphone_steps += iphone
-        total_difference += diff
+#     for iwatch, iphone, diff in data:
+#         total_iwatch_steps += iwatch
+#         total_iphone_steps += iphone
+#         total_difference += diff
 
-    average_iwatch_steps = total_iwatch_steps / num_days
-    average_iphone_steps = total_iphone_steps / num_days
-    average_difference = total_difference / num_days
+#     average_iwatch_steps = total_iwatch_steps / num_days
+#     average_iphone_steps = total_iphone_steps / num_days
+#     average_difference = total_difference / num_days
 
-    return average_iwatch_steps, average_iphone_steps, average_difference
+#     return average_iwatch_steps, average_iphone_steps, average_difference
 
-avg_iwatch, avg_iphone, avg_diff = analyze_steps(data)
-print("Average iWatch steps per day:", avg_iwatch)
-print("Average iPhone steps per day:", avg_iphone)
-print("Average difference per day:", avg_diff)
+# avg_iwatch, avg_iphone, avg_diff = analyze_steps(data)
+# print("Average iWatch steps per day:", avg_iwatch)
+# print("Average iPhone steps per day:", avg_iphone)
+# print("Average difference per day:", avg_diff)
+
+
+# chatgpt code
+import pandas as pd
+from io import StringIO
+
+def load_data(data: str) -> pd.DataFrame:
+    return pd.read_csv(StringIO(data), sep="\t")
+
+def average_steps(data: pd.DataFrame) -> float:
+    return data[["Iwatch(step)", "Iphone(step)"]].mean(axis=1).mean()
+
+def average_steps_weekday_weekend(data: pd.DataFrame) -> dict:
+    weekday_data = data[data["Weekday/Weekend"] == "Weekday"]
+    weekend_data = data[data["Weekday/Weekend"] == "Weekend"]
+    return {
+        "Weekday": average_steps(weekday_data),
+        "Weekend": average_steps(weekend_data),
+    }
+
+def consistency_ratio(data: pd.DataFrame) -> float:
+    consistent = len(data[data["Consistency"].str.contains("consistent")])
+    total = len(data)
+    return consistent / total
+
+def major_difference_days(data: pd.DataFrame) -> pd.DataFrame:
+    return data[data["Consistency"] == "Major differences"]
