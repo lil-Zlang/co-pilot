@@ -30,7 +30,20 @@ def classify_activity(steps_list):
     print(f"High: {high_count}")
 
 
+def count_status(steps_data):
+    status_counts = {'Exhausted': 0, 'Tired': 0, 'Alert': 0, 'Energized': 0}
+    
+    for steps in steps_data:
+        if steps == 0:
+            status_counts['Exhausted'] += 1
+        elif 0 < steps <= 300:
+            status_counts['Tired'] += 1
+        elif 301 <= steps < 1000:
+            status_counts['Alert'] += 1
+        else:
+            status_counts['Energized'] += 1
 
+    return status_counts
 
 def count_days_and_steps(dates_list, steps_list_W, steps_list_I):
     # Initialize an empty dictionary to store the counts and indices of each date
@@ -56,16 +69,38 @@ def count_days_and_steps(dates_list, steps_list_W, steps_list_I):
             date_counts[date_only]['indices'].append(index)
 
     # Print the counts and steps for each date
+    # print(f"Total days: {len(date_counts)}")
+    # print("Dates:")
+    # for date, date_info in date_counts.items():
+    #     count = date_info['count']
+    #     indices = date_info['indices']
+    #     steps_W = [steps_list_W[i] for i in indices]
+    #     steps_I = [steps_list_I[i] for i in indices]
+
+    #     status_counts_W = count_status(steps_W)
+    #     status_counts_I = count_status(steps_I)
+
+    #     print(f"{date}: {count} records")
+    #     print(f"  Iwatch: {sum(steps_W)} steps, {status_counts_W}")
+    #     print(f"  iPhone: {sum(steps_I)} steps, {status_counts_I}")
+        
+
+            # Print the counts and steps for each date
     print(f"Total days: {len(date_counts)}")
     print("Dates:")
     for date, date_info in date_counts.items():
         count = date_info['count']
         indices = date_info['indices']
-        steps_sum_W = sum([steps_list_W[i] for i in indices])
-        steps_sum_I = sum([steps_list_I[i] for i in indices])
+        steps_W = [0 if pd.isna(steps_list_W[i]) else steps_list_W[i] for i in indices]
+        steps_I = [0 if pd.isna(steps_list_I[i]) else steps_list_I[i] for i in indices]
 
-        print(f"{date}: {count} records, Iwatch {steps_sum_W} steps, Iphone {steps_sum_I} steps")
+        status_counts_W = count_status(steps_W)
+        status_counts_I = count_status(steps_I)
 
+        print(f"{date}: {count} records")
+        print(f"  Iwatch: {int(sum(steps_W))} steps, {status_counts_W}")
+        print(f"  iPhone: {int(sum(steps_I))} steps, {status_counts_I}")
+        
 file_path = '/Users/langgui/Downloads/Hours-Step-14days.csv'
 data = pd.read_csv(file_path)
 
