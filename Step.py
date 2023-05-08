@@ -29,19 +29,19 @@ def classify_activity(steps_list):
     print(f"Moderate: {moderate_count}")
     print(f"High: {high_count}")
 
-
+# count_status
 def count_status(steps_data):
-    status_counts = {'Exhausted': 0, 'Tired': 0, 'Alert': 0, 'Energized': 0}
+    status_counts = {'NoData': 0, 'Inactive': 0, 'Active': 0, 'Very Active': 0}
     
     for steps in steps_data:
         if steps == 0:
-            status_counts['Exhausted'] += 1
+            status_counts['NoData'] += 1
         elif 0 < steps <= 300:
-            status_counts['Tired'] += 1
+            status_counts['Inactive'] += 1
         elif 301 <= steps < 1000:
-            status_counts['Alert'] += 1
+            status_counts['Active'] += 1
         else:
-            status_counts['Energized'] += 1
+            status_counts['Very Active'] += 1
 
     return status_counts
 
@@ -100,8 +100,73 @@ def count_days_and_steps(dates_list, steps_list_W, steps_list_I):
         print(f"{date}: {count} records")
         print(f"  Iwatch: {int(sum(steps_W))} steps, {status_counts_W}")
         print(f"  iPhone: {int(sum(steps_I))} steps, {status_counts_I}")
+
         
-file_path = '/Users/langgui/Downloads/Hours-Step-14days.csv'
+
+
+# count the number of days and steps for each date
+def count_activity_hours(dates_list, steps_list):
+    date_counts = {}
+
+    for index, date_val in enumerate(dates_list):
+        if not isinstance(date_val, str):
+            date_str = str(date_val)
+        else:
+            date_str = date_val
+
+        date_only = date_str.split()[0]
+
+        if date_only not in date_counts:
+            date_counts[date_only] = {'count': 1, 'indices': [index]}
+        else:
+            date_counts[date_only]['count'] += 1
+            date_counts[date_only]['indices'].append(index)
+
+    activity_hours_data = []
+
+    for date, date_info in date_counts.items():
+        count = date_info['count']
+        indices = date_info['indices']
+        steps_data = [steps_list[i] for i in indices]
+
+        no_data = sum(1 for s in steps_data if s == 0)
+        at_least_1_step = sum(1 for s in steps_data if s >= 1)
+        low_active = sum(1 for s in steps_data if 1 <= s <= 300)
+        active = sum(1 for s in steps_data if s >= 301)
+
+        activity_hours_data.append({
+            'Date': date,
+            'No Data': no_data,
+            'At least 1 step': at_least_1_step,
+            'Low-active': low_active,
+            'Active': active
+        })
+
+    return activity_hours_data
+
+# export the activity hours data to an Excel file
+def export_to_excel(activity_hours_data, file_name):
+    df = pd.DataFrame(activity_hours_data)
+    df.to_excel(file_name, index=False)
+
+file_path = '/Users/langgui/Documents/GitHub/co-pilot/Hours-Step-14days.csv'
+data = pd.read_csv(file_path)
+
+column_a_data = data.iloc[:, 0].tolist()
+column_b_data = data.iloc[:, 1].tolist()
+
+activity_hours_data = count_activity_hours(column_a_data, column_b_data)
+export_to_excel(activity_hours_data, 'activity_hours_summary.xlsx')
+
+
+
+
+
+
+
+
+
+file_path = '/Users/langgui/Documents/GitHub/co-pilot/Hours-Step-14days.csv'
 data = pd.read_csv(file_path)
 
 # Extract the values in column B (ignoring the header)
