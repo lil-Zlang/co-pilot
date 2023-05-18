@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def classify_activity(steps_list):
     # Initialize counters for each activity level
     none_count = 0
@@ -149,6 +150,9 @@ def export_to_excel(activity_hours_data, file_name):
     df = pd.DataFrame(activity_hours_data)
     df.to_excel(file_name, index=False)
 
+#/Users/langgui/Documents/GitHub/co-pilot/Participant-01-second-detail.csv
+#'/Users/langgui/Documents/GitHub/co-pilot/Hours-Step-14days.csv'   
+
 file_path = '/Users/langgui/Documents/GitHub/co-pilot/Hours-Step-14days.csv'
 data = pd.read_csv(file_path)
 
@@ -157,9 +161,6 @@ column_b_data = data.iloc[:, 1].tolist()
 
 activity_hours_data = count_activity_hours(column_a_data, column_b_data)
 export_to_excel(activity_hours_data, 'activity_hours_summary.xlsx')
-
-
-
 
 
 
@@ -183,18 +184,3 @@ column_a_data = data.iloc[:, 0].tolist()
 
 # Call the count_days_and_steps function with the extracted dates and steps data
 count_days_and_steps(column_a_data, column_b_data, column_c_data)
-
-
-
-
-
-
-
-
-
-# def read_csv_data(file_path):
-#     ''' Read CSV file and return a list of lists '''
-#     import csv
-#     with open(file_path, newline='') as csvfile:
-#         data = list(csv.reader(csvfile))
-#     return data

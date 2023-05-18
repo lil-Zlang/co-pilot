@@ -1,0 +1,75 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def summarize_active_time(dates_list, steps_list):
+    date_counts = {}
+
+    for index, date_val in enumerate(dates_list):
+        if not isinstance(date_val, str):
+            date_str = str(date_val)
+        else:
+            date_str = date_val
+
+        date_only = date_str.split()[0]
+
+        if date_only not in date_counts:
+            date_counts[date_only] = {'count': 1, 'indices': [index]}
+        else:
+            date_counts[date_only]['count'] += 1
+            date_counts[date_only]['indices'].append(index)
+
+    active_time_data = []
+
+    for date, date_info in date_counts.items():
+        count = date_info['count']
+        indices = date_info['indices']
+        steps_data = [steps_list[i] for i in indices]
+
+        active_times = []
+        for i, steps in enumerate(steps_data):
+            if steps > 300:   # changed condition to get active times
+                time = dates_list[indices[i]].split()[1]
+                active_times.append(time)
+
+        active_time_data.append({
+            'Date': date,
+            'Active Times': active_times
+        })
+
+    return active_time_data
+
+
+# Read the data from the CSV file
+file_path = '/Users/langgui/Documents/GitHub/co-pilot/Hours-Step-14days.csv'
+data = pd.read_csv(file_path)
+
+# Extract the values in column A (ignoring the header)
+column_a_data = data.iloc[:, 0].tolist()
+
+# Extract the values in column B (ignoring the header)
+column_b_data = data.iloc[:, 1].tolist()
+
+# Call the summarize_active_time function with the extracted dates and steps data
+active_time_data = summarize_active_time(column_a_data, column_b_data)
+
+# Print out the active times for each date
+for item in active_time_data:
+    date = item['Date']
+    active_times = item['Active Times']
+    print(f"{date}: Active Times - {active_times}")
+
+# Prepare the data for plotting
+x_values = [item['Date'] for item in active_time_data]
+y_values = [len(item['Active Times']) for item in active_time_data]
+
+# Plotting the graph
+plt.figure(figsize=(12, 6))
+plt.bar(x_values, y_values)
+plt.xlabel('Date')
+plt.ylabel('Active Time Count')
+plt.title('Active Time Distribution')
+plt.xticks(rotation=45)
+plt.tight_layout()
+
+# Display the graph
+plt.show()

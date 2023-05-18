@@ -13,40 +13,38 @@ def count_days_and_average_hr(dates_list, hr_list):
 
         date_obj = datetime.strptime(date_str, '%m/%d/%y %H:%M')
         date_only = date_obj.strftime('%Y-%m-%d')
-        hour_only = date_obj.hour
+        time_only = date_obj.strftime('%H:%M')  # get hour and minute
 
         if date_only not in date_counts:
-            date_counts[date_only] = {'hours': {hour_only: {'count': 1, 'indices': [index]}}, 'rest_count': 0, 'active_count': 0}
-        elif hour_only not in date_counts[date_only]['hours']:
-            date_counts[date_only]['hours'][hour_only] = {'count': 1, 'indices': [index]}
+            date_counts[date_only] = {'times': {time_only: {'count': 1, 'indices': [index]}}, 'rest_count': 0, 'active_count': 0}
+        elif time_only not in date_counts[date_only]['times']:
+            date_counts[date_only]['times'][time_only] = {'count': 1, 'indices': [index]}
         else:
-            date_counts[date_only]['hours'][hour_only]['count'] += 1
-            date_counts[date_only]['hours'][hour_only]['indices'].append(index)
+            date_counts[date_only]['times'][time_only]['count'] += 1
+            date_counts[date_only]['times'][time_only]['indices'].append(index)
 
-#Export to excel
     data = []
     for date, date_info in date_counts.items():
-        for hour, hour_info in date_info['hours'].items():
-            count = hour_info['count']
-            indices = hour_info['indices']
+        for time, time_info in date_info['times'].items():
+            count = time_info['count']
+            indices = time_info['indices']
             hr_data = [hr_list[i] for i in indices]
             rest_count = len([hr for hr in hr_data if hr < 100])
             active_count = count - rest_count
             avg_hr = sum(hr_data) / count
 
-            data.append({'Date': date, 'Hour': hour, 'Active Count': active_count, 'Rest Count': rest_count})
+            data.append({'Date': date, 'Time': time, 'Active Count': active_count, 'Rest Count': rest_count})
 
     df = pd.DataFrame(data)
     df.to_excel('HeartRateData.xlsx', index=False)
 
-#Print out the result
     print(f"Total days: {len(date_counts)}")
     print("Dates:")
     for date, date_info in date_counts.items():
         print(f"{date}:")
-        for hour, hour_info in date_info['hours'].items():
-            count = hour_info['count']
-            indices = hour_info['indices']
+        for time, time_info in date_info['times'].items():
+            count = time_info['count']
+            indices = time_info['indices']
             hr_data = [hr_list[i] for i in indices]
             rest_count = len([hr for hr in hr_data if hr < 100])
             active_count = count - rest_count
@@ -55,7 +53,7 @@ def count_days_and_average_hr(dates_list, hr_list):
 
             avg_hr = sum(hr_data) / count
 
-        print(f"    Hour {hour}: {count} records, average hourly heart rate: {avg_hr:.2f}, Active count: {active_count}, Rest count: {rest_count}")
+            print(f"    Time {time}: {count} records, average hourly heart rate: {avg_hr:.2f}, Active count: {active_count}, Rest count: {rest_count}")
         print(f"    Total Active count: {date_counts[date]['active_count']}, Total Rest count: {date_counts[date]['rest_count']}")
 
 #Read the csv file
